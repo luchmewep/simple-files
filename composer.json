@@ -1,0 +1,55 @@
+{
+    "name": "luchavez/simple-files",
+    "description": "A simple approach to adding polymorphic files such as images to any Eloquent models in Laravel applications",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "James Carlo S. Luchavez",
+            "email": "jamescarloluchavez@gmail.com",
+            "homepage": "https://www.linkedin.com/in/jsluchavez"
+        }
+    ],
+    "homepage": "https://github.com/luchmewep/simple-files",
+    "keywords": ["Laravel", "SimpleFiles"],
+    "require": {
+        "php": "^8.0",
+        "illuminate/support": "~8|~9",
+        "luchavez/starter-kit": "^1.0",
+        "league/flysystem-aws-s3-v3": "^1.0|^2.0|^3.0",
+        "ext-fileinfo": "*",
+        "league/flysystem-path-prefixing": "^3.10",
+        "league/flysystem-read-only": "^3.10"
+    },
+    "require-dev": {
+        "roave/security-advisories": "dev-latest",
+        "phpunit/phpunit": "~9.0",
+        "orchestra/testbench": "~6|~7"
+    },
+    "autoload": {
+        "psr-4": {
+            "Luchavez\\SimpleFiles\\": "src/",
+            "Database\\Factories\\": "database/factories",
+            "Database\\Seeders\\": "database/seeders"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Luchavez\\SimpleFiles\\Tests\\": "tests"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Luchavez\\SimpleFiles\\Providers\\SimpleFilesServiceProvider"
+            ],
+            "aliases": {
+                "SimpleFiles": "Luchavez\\SimpleFiles\\Facades\\SimpleFiles"
+            }
+        },
+        "branch-alias": {
+            "dev-master": "1.0.x-dev",
+            "dev-develop": "1.0.x-dev",
+            "dev-feature": "1.0.x-dev"
+        }
+    }
+}
