@@ -29,6 +29,7 @@ return new class () extends Migration {
                 $table->id();
                 $table->uuid('uuid')->unique();
                 $table->foreignIdFor(starterKit()->getUserModel())->nullable()->constrained();
+                $table->boolean('is_public')->nullable();
                 $table->string('path')->unique();
                 $table->string('name');
                 $table->string('mime_type')->nullable()->index();

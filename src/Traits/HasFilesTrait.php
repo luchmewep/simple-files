@@ -2,7 +2,7 @@
 
 namespace Luchavez\SimpleFiles\Traits;
 
-use App\Models\User;
+use Illuminate\Contracts\Auth\Authenticatable as User;
 use Luchavez\SimpleFiles\Exceptions\FileUploadFailedException;
 use Luchavez\SimpleFiles\Models\File;
 use Luchavez\SimpleFiles\Models\Fileable;
@@ -173,7 +173,7 @@ trait HasFilesTrait
      */
     public function syncFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, User $user = null, ?array $description = null, bool $detaching = true, bool $is_public = true, bool $preserve_name = false): void
     {
-        $file = $this->collect($file);
+        $file = $this->collectFiles($file);
 
         if ($file->count()) {
             if ($file->first() instanceof File) {
@@ -228,7 +228,7 @@ trait HasFilesTrait
      */
     public function detachFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, User $user = null, bool $touch = true, bool $is_public = true, bool $preserve_name = false): void
     {
-        $file = $this->collect($file);
+        $file = $this->collectFiles($file);
 
         if ($file->count()) {
             if ($file->first() instanceof File) {
@@ -272,7 +272,7 @@ trait HasFilesTrait
      * @param  \Illuminate\Http\File|File|Collection|UploadedFile|array|string  $file
      * @return Collection
      */
-    protected function collect(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file): Collection
+    protected function collectFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file): Collection
     {
         // If not a collection nor an array, convert to array
         if (! ($file instanceof Collection || is_array($file))) {

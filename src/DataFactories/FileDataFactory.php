@@ -15,6 +15,11 @@ use Illuminate\Database\Eloquent\Builder;
 class FileDataFactory extends BaseDataFactory
 {
     /**
+     * @var bool|null
+     */
+    public bool|null $is_public = null;
+
+    /**
      * @var string
      */
     public string $path;
@@ -22,7 +27,7 @@ class FileDataFactory extends BaseDataFactory
     /**
      * @var int|string|null
      */
-    public int|string|null $user_id;
+    public int|string|null $user_id = null;
 
     /**
      * @var string|null
@@ -52,6 +57,7 @@ class FileDataFactory extends BaseDataFactory
     public function getUniqueKeys(): array
     {
         return [
+            'is_public',
             'path',
         ];
     }
