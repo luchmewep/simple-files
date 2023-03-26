@@ -85,24 +85,8 @@ class File extends Model
     /**
      * @return bool
      */
-    public function isPublic(): bool
-    {
-        return simpleFiles()->isFilePublic($this);
-    }
-
-    /**
-     * @return bool
-     */
-    public function isPrivate(): bool
-    {
-        return ! simpleFiles()->isFilePublic($this);
-    }
-
-    /**
-     * @return bool
-     */
     public function exists(): bool
     {
-        return simpleFiles()->exists($this->path);
+        return simpleFiles()->exists($this->path, $this->is_public);
     }
 }
