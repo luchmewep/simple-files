@@ -1,8 +1,15 @@
 # Simple Files
 
+[![Latest Version on Packagist][ico-version]][link-packagist]
+[![Total Downloads][ico-downloads]][link-downloads]
+
 ![Simple Files Banner](./images/banner.png "Banner")
 
+## Introduction
+
 Implementing a public-private filesystem structure to your Laravel application can be a hassle. But with "luchavez/simple-files", it's easy! This package is built with that in mind so that you can proceed with more important things in your project. It's perfect for Laravel applications that need to work with files. And the best part? It can process not only uploaded files but also Base64 strings and image URLs! Plus, it's especially effective on AWS S3 buckets. Try it out today and see how it can help you!
+
+<p align="center"><img src="./images/logo.png" width="300"/></p>
 
 Check out the [examples](#examples) below to get a clearer picture.
 
