@@ -31,7 +31,7 @@ class FileObserver
     public function deleting(File $file): bool
     {
         if ($file->isForceDeleting()) {
-            return simpleFiles()->delete($file->path);
+            return simpleFiles()->delete($file->path, $file->is_public);
         }
 
         return true;
