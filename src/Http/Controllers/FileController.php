@@ -56,7 +56,7 @@ class FileController extends Controller
 
         event(new FileCollectedEvent($data));
 
-        return customResponse()
+        return simpleResponse()
             ->data($data)
             ->message('Successfully collected record.')
             ->success()
@@ -88,7 +88,7 @@ class FileController extends Controller
 
         event(new FileCreatedEvent($model));
 
-        return customResponse()
+        return simpleResponse()
             ->data($model)
             ->message('Successfully uploaded file.')
             ->success()
@@ -114,7 +114,7 @@ class FileController extends Controller
 
         event(new FileShownEvent($file));
 
-        return customResponse()
+        return simpleResponse()
             ->data($file)
             ->message('Successfully collected record.')
             ->success()
@@ -142,7 +142,7 @@ class FileController extends Controller
 
         event(new FileUpdatedEvent($file));
 
-        return customResponse()
+        return simpleResponse()
             ->data($file)
             ->message('Successfully updated record.')
             ->success()
@@ -170,7 +170,7 @@ class FileController extends Controller
 
         event(new FileArchivedEvent($file));
 
-        return customResponse()
+        return simpleResponse()
             ->data($file)
             ->message('Successfully archived record.')
             ->success()
@@ -200,7 +200,7 @@ class FileController extends Controller
 
         event(new FileRestoredEvent($file));
 
-        return customResponse()
+        return simpleResponse()
             ->data($file)
             ->message('Successfully restored record.')
             ->success()
