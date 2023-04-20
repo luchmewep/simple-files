@@ -21,7 +21,7 @@ class FileUploadFailedException extends Exception
      */
     public function render(Request $request): JsonResponse
     {
-        return customResponse()
+        return simpleResponse()
             ->data([])
             ->message('Failed to upload file.')
             ->failed(409)
