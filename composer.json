@@ -13,7 +13,7 @@
     "keywords": ["Laravel", "SimpleFiles"],
     "require": {
         "php": "^8.0",
-        "illuminate/support": "~8|~9",
+        "illuminate/support": "~9",
         "luchavez/starter-kit": "^1.0",
         "league/flysystem-aws-s3-v3": "^1.0|^2.0|^3.0",
         "ext-fileinfo": "*",
