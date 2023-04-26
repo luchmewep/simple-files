@@ -30,13 +30,14 @@ return new class () extends Migration {
                 $table->uuid('uuid')->unique();
                 $table->foreignIdFor(starterKit()->getUserModel())->nullable()->constrained();
                 $table->boolean('is_public')->nullable();
-                $table->string('path')->unique();
+                $table->string('path');
                 $table->string('name');
                 $table->string('mime_type')->nullable()->index();
                 $table->string('extension')->nullable()->index();
                 $table->unsignedInteger('size')->nullable();
                 $table->text('url')->nullable();
                 $table->timestamp('url_expires_at')->nullable();
+                $table->unique(['is_public', 'path'], 'files_unique_path');
                 $table->softDeletes();
                 $table->timestamps();
             }

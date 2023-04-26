@@ -1,11 +1,8 @@
 <?php
 
 return [
-    'default_driver' => env('SF_FILESYSTEM_DRIVER', config('filesystems.default')),
-    'expire_after' => [
-        'time_unit' => env('SF_EXPIRE_AFTER_UNIT', 'days'),
-        'time_value' => env('SF_EXPIRE_AFTER_VALUE', 1),
-    ],
+    'default_disk' => env('SF_FILESYSTEM_DISK', config('filesystems.default')),
+    'expire_after' => env('SF_EXPIRE_AFTER', '1 day'),
     'directory' => [
         'public' => env('SF_PUBLIC_DIRECTORY', 'public'),
         'private' => env('SF_PRIVATE_DIRECTORY', 'private'),
