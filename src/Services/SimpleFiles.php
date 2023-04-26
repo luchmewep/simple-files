@@ -43,33 +43,17 @@ class SimpleFiles
     /**
      * @return string
      */
-    public function getFilesystemDriver(): string
+    public function getFilesystemDisk(): string
     {
-        return config('simple-files.default_driver');
+        return config('simple-files.default_disk');
     }
 
     /**
      * @return string
      */
-    public function getDriver(): string
+    public function getDisk(): string
     {
-        return $this->getFilesystemDriver();
-    }
-
-    /**
-     * @return string
-     */
-    public function getExpireAfterUnit(): string
-    {
-        return config('simple-files.expire_after.time_unit');
-    }
-
-    /**
-     * @return string
-     */
-    public function getExpireAfterValue(): string
-    {
-        return config('simple-files.expire_after.time_value');
+        return $this->getFilesystemDisk();
     }
 
     /**
@@ -77,7 +61,7 @@ class SimpleFiles
      */
     public function getExpireAfter(): Carbon
     {
-        return now()->add($this->getExpireAfterValue().' '.$this->getExpireAfterUnit());
+        return Carbon::parse(config('simple-files.expire_after'));
     }
 
     /**
@@ -114,7 +98,7 @@ class SimpleFiles
     public function getFilesystemAdapter(bool|null $is_public = null, bool $read_only = false): Filesystem
     {
         if (is_null($is_public)) {
-            $disk = $this->getDriver();
+            $disk = $this->getDisk();
         } else {
             // Example: sf-public-ro
             $disk = collect(['sf', $is_public ? 'public' : 'private', $read_only ? 'ro' : null])->filter()->join('-');
@@ -187,7 +171,7 @@ class SimpleFiles
 
         $factory->is_public = $is_public;
         $factory->user_id = $user?->id;
-        $folder = $factory->user_id ?? '';
+        $folder = $factory->user_id;
         $factory->name = Str::random(40);
 
         // Upload UploadedFile to Storage
@@ -201,7 +185,7 @@ class SimpleFiles
             }
 
             $factory->name = trim($factory->name.'.'.$factory->extension, '/.');
-            $folder .= '/'.$factory->mime_type;
+            $folder = collect([$folder, $factory->mime_type])->filter()->implode('/');
 
             if ($preserve_name &&
                 ! $this->shouldOverwriteOnExists() &&
@@ -236,7 +220,7 @@ class SimpleFiles
 
             // Get name
             $factory->name = trim($factory->name.'.'.$factory->extension, '.');
-            $path = implode('/', [$folder, $factory->mime_type, $factory->name]);
+            $path = collect([$folder, $factory->mime_type, $factory->name])->filter()->implode('/');
 
             if (! $this->putFile(path: $path, contents: $contents, options: $options, is_public: $is_public)) {
                 throw new FileUploadFailedException();

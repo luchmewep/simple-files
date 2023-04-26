@@ -31,9 +31,8 @@ $ composer require luchavez/simple-files:^1.0.0
 
 | Variable Name           | Default Value                   |
 |-------------------------|---------------------------------|
-| `SF_FILESYSTEM_DRIVER`  | `config('filesystems.default')` |
-| `SF_EXPIRE_AFTER_UNIT`  | `days`                          |
-| `SF_EXPIRE_AFTER_VALUE` | 1                               |
+| `SF_FILESYSTEM_DISK`    | `config('filesystems.default')` |
+| `SF_EXPIRE_AFTER`       | `1 day`                         |
 | `SF_PUBLIC_DIRECTORY`   | `public`                        |
 | `SF_PRIVATE_DIRECTORY`  | `private`                       |
 
@@ -50,8 +49,8 @@ Here's the list of its available methods.
 
 | Method Name               | Return Type                                              | Description                                                                        |
 |---------------------------|----------------------------------------------------------|------------------------------------------------------------------------------------|
-| `getFileSystemDriver`     | `string`                                                 | gets the filesystem driver                                                         |
-| `getDriver`               | `string`                                                 | shortcut for `getFileSystemDriver` method                                          |
+| `getFileSystemDisk`       | `string`                                                 | gets the filesystem disk                                                           |
+| `getDisk`                 | `string`                                                 | shortcut for `getFileSystemDisk` method                                            |
 | `getExpireAfterUnit`      | `string`                                                 | gets the time unit for temporary URL expiration                                    |
 | `getExpireAfterValue`     | `string`                                                 | gets the time value for temporary URL expiration                                   |
 | `getExpireAfter`          | `Illuminate\Support\Carbon`                              | gets the `Carbon` equivalent of `getExpireAfterUnit()` and `getExpireAfterValue()` |
@@ -158,11 +157,10 @@ Here's the list of methods that will be added to Eloquent models.
 Here are the `.env` variables used in this example:
 
 ```dotenv
-SF_FILESYSTEM_DRIVER=s3
+SF_FILESYSTEM_DISK=s3
 SF_PUBLIC_DIRECTORY=public/dev/dummy
 SF_PRIVATE_DIRECTORY=private/dev/dummy
-SF_EXPIRE_AFTER_UNIT=minutes
-SF_EXPIRE_AFTER_VALUE=2
+SF_EXPIRE_AFTER=1 day
 ```
 
 ### Uploading files

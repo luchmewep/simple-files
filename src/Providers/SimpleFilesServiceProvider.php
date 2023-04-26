@@ -70,9 +70,8 @@ class SimpleFilesServiceProvider extends BaseStarterKitServiceProvider
      * @var array
      */
     protected array $env_vars = [
-        'SF_FILESYSTEM_DRIVER' => '${FILESYSTEM_DISK}',
-        'SF_EXPIRE_AFTER_UNIT' => 'days',
-        'SF_EXPIRE_AFTER_VALUE' => 1,
+        'SF_FILESYSTEM_DISK' => '${FILESYSTEM_DISK}',
+        'SF_EXPIRE_AFTER' => '1 day',
         'SF_PUBLIC_DIRECTORY' => 'public',
         'SF_PRIVATE_DIRECTORY' => 'private',
         'SF_OVERWRITE_ON_EXISTS' => false,
