@@ -9,7 +9,7 @@
             "homepage": "https://www.linkedin.com/in/jsluchavez"
         }
     ],
-    "homepage": "https://github.com/luchmewep/simple-files",
+    "homepage": "https://github.com/luchavez-technologies/simple-files",
     "keywords": ["Laravel", "SimpleFiles"],
     "require": {
         "php": "^8.0",
