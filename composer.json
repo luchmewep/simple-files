@@ -9,11 +9,11 @@
             "homepage": "https://www.linkedin.com/in/jsluchavez"
         }
     ],
-    "homepage": "https://github.com/luchmewep/simple-files",
+    "homepage": "https://github.com/luchavez-technologies/simple-files",
     "keywords": ["Laravel", "SimpleFiles"],
     "require": {
         "php": "^8.0",
-        "illuminate/support": "~9",
+        "illuminate/support": "~9|~10",
         "luchavez/starter-kit": "^1.0",
         "league/flysystem-aws-s3-v3": "^1.0|^2.0|^3.0",
         "ext-fileinfo": "*",
@@ -23,7 +23,7 @@
     "require-dev": {
         "roave/security-advisories": "dev-latest",
         "phpunit/phpunit": "~9.0",
-        "orchestra/testbench": "~7"
+        "orchestra/testbench": "~7|~8"
     },
     "autoload": {
         "psr-4": {
