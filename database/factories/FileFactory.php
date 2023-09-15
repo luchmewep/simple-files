@@ -2,9 +2,8 @@
 
 namespace Database\Factories;
 
-// Model
-use Luchavez\SimpleFiles\Models\File;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Luchavez\SimpleFiles\Models\File;
 
 /**
  * Class File

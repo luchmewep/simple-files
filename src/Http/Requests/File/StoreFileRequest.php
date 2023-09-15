@@ -2,7 +2,7 @@
 
 namespace Luchavez\SimpleFiles\Http\Requests\File;
 
-use Luchavez\StarterKit\Requests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 /**
  * Class StoreFileRequest
@@ -29,7 +29,8 @@ class StoreFileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'preserve_name' => 'boolean',
+            'is_public' => 'boolean',
         ];
     }
 

@@ -2,9 +2,6 @@
 
 namespace Luchavez\SimpleFiles\Console\Commands;
 
-use Luchavez\SimpleFiles\Models\File;
-use Luchavez\SimpleFiles\Models\Fileable;
-use Luchavez\StarterKit\Traits\UsesCommandCustomMessagesTrait;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Schema;
@@ -14,6 +11,9 @@ use League\Flysystem\FileAttributes;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\StorageAttributes;
 use League\MimeTypeDetection\GeneratedExtensionToMimeTypeMap;
+use Luchavez\SimpleFiles\Models\File;
+use Luchavez\SimpleFiles\Models\Fileable;
+use Luchavez\StarterKit\Traits\UsesCommandCustomMessagesTrait;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
@@ -93,7 +93,7 @@ class SyncFilesCommand extends Command
     /**
      * @throws FilesystemException
      */
-    public function syncFiles(bool $is_public)
+    public function syncFiles(bool $is_public): void
     {
         $directory = $is_public ? simpleFiles()->getPublicDirectory() : simpleFiles()->getPrivateDirectory();
 

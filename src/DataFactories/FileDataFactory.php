@@ -2,10 +2,9 @@
 
 namespace Luchavez\SimpleFiles\DataFactories;
 
+use Illuminate\Database\Eloquent\Builder;
 use Luchavez\SimpleFiles\Models\File;
 use Luchavez\StarterKit\Abstracts\BaseDataFactory;
-// Model
-use Illuminate\Database\Eloquent\Builder;
 
 /**
  * Class FileDataFactory
@@ -17,7 +16,7 @@ class FileDataFactory extends BaseDataFactory
     /**
      * @var bool|null
      */
-    public bool|null $is_public = null;
+    public ?bool $is_public = null;
 
     /**
      * @var string
