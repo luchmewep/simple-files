@@ -3,25 +3,26 @@
 namespace Luchavez\SimpleFiles\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Http\JsonResponse;
 use Luchavez\SimpleFiles\Events\File\FileArchivedEvent;
-use Luchavez\SimpleFiles\Events\File\FileCollectedEvent;
-use Luchavez\SimpleFiles\Events\File\FileCreatedEvent;
 // Model
-use Luchavez\SimpleFiles\Events\File\FileRestoredEvent;
+use Luchavez\SimpleFiles\Events\File\FileCollectedEvent;
 // Requests
+use Luchavez\SimpleFiles\Events\File\FileRestoredEvent;
 use Luchavez\SimpleFiles\Events\File\FileShownEvent;
 use Luchavez\SimpleFiles\Events\File\FileUpdatedEvent;
 use Luchavez\SimpleFiles\Exceptions\FileUploadFailedException;
 use Luchavez\SimpleFiles\Http\Requests\File\DeleteFileRequest;
 use Luchavez\SimpleFiles\Http\Requests\File\IndexFileRequest;
-use Luchavez\SimpleFiles\Http\Requests\File\RestoreFileRequest;
 // Events
+use Luchavez\SimpleFiles\Http\Requests\File\RestoreFileRequest;
 use Luchavez\SimpleFiles\Http\Requests\File\ShowFileRequest;
 use Luchavez\SimpleFiles\Http\Requests\File\StoreFileRequest;
 use Luchavez\SimpleFiles\Http\Requests\File\UpdateFileRequest;
 use Luchavez\SimpleFiles\Models\File;
 use Luchavez\StarterKit\Exceptions\UnauthorizedException;
-use Illuminate\Http\JsonResponse;
 
 /**
  * Class FileController
@@ -71,12 +72,12 @@ class FileController extends Controller
      * @param  StoreFileRequest  $request
      * @return JsonResponse
      *
-     * @throws UnauthorizedException|FileUploadFailedException
+     * @throws FileUploadFailedException|AuthenticationException
      */
     public function store(StoreFileRequest $request): JsonResponse
     {
         if (! ($user = $request->user())) {
-            throw new UnauthorizedException();
+            throw new AuthenticationException();
         }
 
         $file = $request->file;
@@ -85,8 +86,6 @@ class FileController extends Controller
         $preserve_name = $request->boolean('preserve_name');
 
         $model = simpleFiles()->store($file, $user, $is_public, $preserve_name);
-
-        event(new FileCreatedEvent($model));
 
         return simpleResponse()
             ->data($model)

@@ -2,12 +2,12 @@
 
 namespace Luchavez\SimpleFiles\Models;
 
-use Luchavez\SimpleFiles\Traits\HasFileFactoryTrait;
-use Luchavez\StarterKit\Traits\UsesUUIDTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Luchavez\SimpleFiles\Traits\HasFileFactoryTrait;
+use Luchavez\StarterKit\Traits\UsesUUIDTrait;
 
 /**
  * Class File

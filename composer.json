@@ -1,6 +1,6 @@
 {
     "name": "luchavez/simple-files",
-    "description": "A simple approach to adding polymorphic files such as images to any Eloquent models in Laravel applications",
+    "description": "A simple approach to adding polymorphic files such as images to any Eloquent models in Laravel 9|10",
     "license": "MIT",
     "authors": [
         {

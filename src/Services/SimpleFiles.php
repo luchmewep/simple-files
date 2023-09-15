@@ -3,19 +3,19 @@
 namespace Luchavez\SimpleFiles\Services;
 
 use Illuminate\Contracts\Auth\Authenticatable;
-use Luchavez\SimpleFiles\DataFactories\FileDataFactory;
-use Luchavez\SimpleFiles\Exceptions\FileUploadFailedException;
-use Luchavez\SimpleFiles\Models\File;
-use Luchavez\SimpleFiles\Models\Fileable;
+use Illuminate\Contracts\Auth\Authenticatable as User;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Contracts\Auth\Authenticatable as User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Luchavez\SimpleFiles\DataFactories\FileDataFactory;
+use Luchavez\SimpleFiles\Exceptions\FileUploadFailedException;
+use Luchavez\SimpleFiles\Models\File;
+use Luchavez\SimpleFiles\Models\Fileable;
 use RuntimeException;
 use Symfony\Component\Mime\MimeTypes;
 
@@ -88,14 +88,22 @@ class SimpleFiles
         return config('simple-files.overwrite_on_exists');
     }
 
+    /**
+     * @return bool
+     */
+    public function shouldSkipUploadOnExists(): bool
+    {
+        return config('simple-files.skip_upload_on_exists');
+    }
+
     /***** FILESYSTEM ADAPTER *****/
 
     /**
-     * @param bool|null $is_public
-     * @param bool $read_only
+     * @param  bool|null  $is_public
+     * @param  bool  $read_only
      * @return Filesystem
      */
-    public function getFilesystemAdapter(bool|null $is_public = null, bool $read_only = false): Filesystem
+    public function getFilesystemAdapter(bool $is_public = null, bool $read_only = false): Filesystem
     {
         if (is_null($is_public)) {
             $disk = $this->getDisk();
@@ -108,17 +116,17 @@ class SimpleFiles
     }
 
     /**
-     * @param bool|null $is_public
-     * @param bool $read_only
+     * @param  bool|null  $is_public
+     * @param  bool  $read_only
      * @return Filesystem
      */
-    public function getAdapter(bool|null $is_public = null, bool $read_only = false): Filesystem
+    public function getAdapter(bool $is_public = null, bool $read_only = false): Filesystem
     {
         return $this->getFilesystemAdapter(is_public: $is_public, read_only: $read_only);
     }
 
     /**
-     * @param bool $read_only
+     * @param  bool  $read_only
      * @return Filesystem
      */
     public function getPublicAdapter(bool $read_only = false): Filesystem
@@ -127,7 +135,7 @@ class SimpleFiles
     }
 
     /**
-     * @param bool $read_only
+     * @param  bool  $read_only
      * @return Filesystem
      */
     public function getPrivateAdapter(bool $read_only = false): Filesystem
@@ -174,7 +182,7 @@ class SimpleFiles
         $folder = $factory->user_id;
         $factory->name = Str::random(40);
 
-        // Upload UploadedFile to Storage
+        // Upload File and UploadedFile instances to Storage
         if ($file instanceof UploadedFile || $file instanceof \Illuminate\Http\File) {
             $factory->mime_type = $file->getMimeType();
             $factory->extension = $file->extension();
@@ -184,25 +192,37 @@ class SimpleFiles
                 $factory->name = Str::of($filename)->before('.')->jsonSerialize();
             }
 
-            $factory->name = trim($factory->name.'.'.$factory->extension, '/.');
             $folder = collect([$folder, $factory->mime_type])->filter()->implode('/');
+            $path = sprintf('%s/%s.%s', $folder, $factory->name, $factory->extension);
 
-            if ($preserve_name &&
-                ! $this->shouldOverwriteOnExists() &&
-                ($path = implode('/', [$folder, $factory->name])) &&
-                $this->exists(path: $path, is_public: $is_public)
-            ) {
-                $factory->path = $path;
-            } elseif ($path = $this->putFileAs(
-                path: $folder,
-                file: $file,
-                name: $factory->name,
-                options: $options,
-                is_public: $is_public
-            )) {
-                $factory->path = $path;
-            } else {
-                throw new FileUploadFailedException();
+            // If file already exists, check the file size and the
+            $skip_upload = false;
+            if ($preserve_name && $this->exists(path: $path, is_public: $is_public)) {
+                if (! $this->shouldOverwriteOnExists()) {
+                    if ($this->shouldSkipUploadOnExists()) {
+                        $skip_upload = true;
+                        $factory->path = $path;
+                    } else {
+                        $factory->name .= sprintf('_%s', time());
+                    }
+                }
+            }
+
+            // Append the extension to the name before upload
+            $factory->name .= sprintf('.%s', $factory->extension);
+
+            if (! $skip_upload) {
+                if ($path = $this->putFileAs(
+                    path: $folder,
+                    file: $file,
+                    name: $factory->name,
+                    options: $options,
+                    is_public: $is_public
+                )) {
+                    $factory->path = $path;
+                } else {
+                    throw new FileUploadFailedException();
+                }
             }
         }
 
@@ -321,32 +341,32 @@ class SimpleFiles
     /***** GET FILES *****/
 
     /**
-     * @param string|null $path
-     * @param bool|null $is_public
-     * @param bool $recursive
+     * @param  string|null  $path
+     * @param  bool|null  $is_public
+     * @param  bool  $recursive
      * @return array
      */
-    public function getFiles(string|null $path = null, bool|null $is_public = null, bool $recursive = false): array
+    public function getFiles(string $path = null, bool $is_public = null, bool $recursive = false): array
     {
         return $this->getFilesystemAdapter($is_public)->files(directory: $path, recursive: $recursive);
     }
 
     /**
-     * @param string|null $path
-     * @param bool $recursive
+     * @param  string|null  $path
+     * @param  bool  $recursive
      * @return array
      */
-    public function getPublicFiles(string|null $path = null, bool $recursive = false): array
+    public function getPublicFiles(string $path = null, bool $recursive = false): array
     {
         return $this->getFiles(path: $path, is_public: true, recursive: $recursive);
     }
 
     /**
-     * @param string|null $path
-     * @param bool $recursive
+     * @param  string|null  $path
+     * @param  bool  $recursive
      * @return array
      */
-    public function getPrivateFiles(string|null $path = null, bool $recursive = false): array
+    public function getPrivateFiles(string $path = null, bool $recursive = false): array
     {
         return $this->getFiles(path: $path, is_public: false, recursive: $recursive);
     }
@@ -354,17 +374,17 @@ class SimpleFiles
     /***** GET FILE *****/
 
     /**
-     * @param string $path
-     * @param bool|null $is_public
+     * @param  string  $path
+     * @param  bool|null  $is_public
      * @return string|null
      */
-    public function getFile(string $path, bool|null $is_public = null): ?string
+    public function getFile(string $path, bool $is_public = null): ?string
     {
         return $this->getFilesystemAdapter($is_public)->get($path);
     }
 
     /**
-     * @param string $path
+     * @param  string  $path
      * @return string|null
      */
     public function getFilePublicly(string $path): ?string
@@ -373,7 +393,7 @@ class SimpleFiles
     }
 
     /**
-     * @param string $path
+     * @param  string  $path
      * @return string|null
      */
     public function getFilePrivately(string $path): ?string
@@ -384,21 +404,21 @@ class SimpleFiles
     /***** PUT FILE *****/
 
     /**
-     * @param string $path
-     * @param string|resource $contents
-     * @param mixed $options
-     * @param bool|null $is_public
+     * @param  string  $path
+     * @param  string|resource  $contents
+     * @param  mixed  $options
+     * @param  bool|null  $is_public
      * @return string|null
      */
-    public function putFile(string $path, $contents, mixed $options = [], bool|null $is_public = null): ?string
+    public function putFile(string $path, $contents, mixed $options = [], bool $is_public = null): ?string
     {
         return $this->getFilesystemAdapter($is_public)->put($path, $contents, $options);
     }
 
     /**
-     * @param string $path
-     * @param string|resource $contents
-     * @param mixed $options
+     * @param  string  $path
+     * @param  string|resource  $contents
+     * @param  mixed  $options
      * @return string|null
      */
     public function putFilePublicly(string $path, $contents, mixed $options = []): ?string
@@ -407,9 +427,9 @@ class SimpleFiles
     }
 
     /**
-     * @param string $path
-     * @param string|resource $contents
-     * @param mixed $options
+     * @param  string  $path
+     * @param  string|resource  $contents
+     * @param  mixed  $options
      * @return string|null
      */
     public function putFilePrivately(string $path, $contents, mixed $options = []): ?string
@@ -420,11 +440,11 @@ class SimpleFiles
     /***** PUT FILE AS *****/
 
     /**
-     * @param string $path
-     * @param \Illuminate\Http\File|UploadedFile $file
-     * @param string $name
-     * @param mixed $options
-     * @param bool|null $is_public
+     * @param  string  $path
+     * @param  \Illuminate\Http\File|UploadedFile  $file
+     * @param  string  $name
+     * @param  mixed  $options
+     * @param  bool|null  $is_public
      * @return string|bool
      */
     public function putFileAs(
@@ -432,16 +452,16 @@ class SimpleFiles
         \Illuminate\Http\File|UploadedFile $file,
         string $name,
         mixed $options = [],
-        bool|null $is_public = null
+        bool $is_public = null
     ): string|bool {
         return $this->getFilesystemAdapter($is_public)->putFileAs($path, $file, $name, $options);
     }
 
     /**
-     * @param string $path
-     * @param \Illuminate\Http\File|UploadedFile $file
-     * @param string $name
-     * @param mixed $options
+     * @param  string  $path
+     * @param  \Illuminate\Http\File|UploadedFile  $file
+     * @param  string  $name
+     * @param  mixed  $options
      * @return string|bool
      */
     public function putFilePubliclyAs(string $path, \Illuminate\Http\File|UploadedFile $file, string $name, mixed $options = []): string|bool
@@ -450,10 +470,10 @@ class SimpleFiles
     }
 
     /**
-     * @param string $path
-     * @param \Illuminate\Http\File|UploadedFile $file
-     * @param string $name
-     * @param mixed $options
+     * @param  string  $path
+     * @param  \Illuminate\Http\File|UploadedFile  $file
+     * @param  string  $name
+     * @param  mixed  $options
      * @return string|bool
      */
     public function putFilePrivatelyAs(string $path, \Illuminate\Http\File|UploadedFile $file, string $name, mixed $options = []): string|bool
@@ -464,11 +484,11 @@ class SimpleFiles
     /***** FILE EXISTENCE *****/
 
     /**
-     * @param string $path
-     * @param bool|null $is_public
+     * @param  string  $path
+     * @param  bool|null  $is_public
      * @return bool
      */
-    public function exists(string $path, bool|null $is_public = null): bool
+    public function exists(string $path, bool $is_public = null): bool
     {
         return $this->getFilesystemAdapter($is_public)->exists($path);
     }
@@ -494,11 +514,11 @@ class SimpleFiles
     /***** DELETE FILES *****/
 
     /**
-     * @param string|string[] $path
-     * @param bool|null $is_public
+     * @param  string|string[]  $path
+     * @param  bool|null  $is_public
      * @return bool
      */
-    public function delete(string|array $path, bool|null $is_public = null): bool
+    public function delete(string|array $path, bool $is_public = null): bool
     {
         return $this->getFilesystemAdapter($is_public)->delete($path);
     }
@@ -524,32 +544,32 @@ class SimpleFiles
     /***** GET DIRECTORIES *****/
 
     /**
-     * @param string|null $path
-     * @param bool|null $is_public
-     * @param bool $recursive
+     * @param  string|null  $path
+     * @param  bool|null  $is_public
+     * @param  bool  $recursive
      * @return array
      */
-    public function getDirectories(string|null $path = null, bool|null $is_public = null, bool $recursive = false): array
+    public function getDirectories(string $path = null, bool $is_public = null, bool $recursive = false): array
     {
         return $this->getFilesystemAdapter($is_public)->directories(directory: $path, recursive: $recursive);
     }
 
     /**
-     * @param string|null $path
-     * @param bool $recursive
+     * @param  string|null  $path
+     * @param  bool  $recursive
      * @return array
      */
-    public function getPublicDirectories(string|null $path = null, bool $recursive = false): array
+    public function getPublicDirectories(string $path = null, bool $recursive = false): array
     {
         return $this->getFilesystemAdapter(true)->directories(directory: $path, recursive: $recursive);
     }
 
     /**
-     * @param string|null $path
-     * @param bool $recursive
+     * @param  string|null  $path
+     * @param  bool  $recursive
      * @return array
      */
-    public function getPrivateDirectories(string|null $path = null, bool $recursive = false): array
+    public function getPrivateDirectories(string $path = null, bool $recursive = false): array
     {
         return $this->getFilesystemAdapter(false)->directories(directory: $path, recursive: $recursive);
     }
@@ -557,17 +577,17 @@ class SimpleFiles
     /***** CLEAN DIRECTORY *****/
 
     /**
-     * @param string $path
-     * @param bool $is_public
+     * @param  string  $path
+     * @param  bool  $is_public
      * @return bool
      */
-    public function deleteFiles(string $path = '', bool|null $is_public = null): bool
+    public function deleteFiles(string $path = '', bool $is_public = null): bool
     {
         return $this->getFilesystemAdapter($is_public)->deleteDirectory($path);
     }
 
     /**
-     * @param string $path
+     * @param  string  $path
      * @return bool
      */
     public function deletePublicFiles(string $path = ''): bool
@@ -576,7 +596,7 @@ class SimpleFiles
     }
 
     /**
-     * @param string $path
+     * @param  string  $path
      * @return bool
      */
     public function deletePrivateFiles(string $path = ''): bool

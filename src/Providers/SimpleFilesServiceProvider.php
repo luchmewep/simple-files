@@ -2,13 +2,13 @@
 
 namespace Luchavez\SimpleFiles\Providers;
 
+use Illuminate\Database\Eloquent\Model;
 use Luchavez\SimpleFiles\Console\Commands\SyncFilesCommand;
 use Luchavez\SimpleFiles\Models\File;
 use Luchavez\SimpleFiles\Observers\FileObserver;
 use Luchavez\SimpleFiles\Repositories\FileRepository;
 use Luchavez\SimpleFiles\Services\SimpleFiles;
 use Luchavez\StarterKit\Abstracts\BaseStarterKitServiceProvider;
-use Illuminate\Database\Eloquent\Model;
 
 class SimpleFilesServiceProvider extends BaseStarterKitServiceProvider
 {
@@ -75,6 +75,7 @@ class SimpleFilesServiceProvider extends BaseStarterKitServiceProvider
         'SF_PUBLIC_DIRECTORY' => 'public',
         'SF_PRIVATE_DIRECTORY' => 'private',
         'SF_OVERWRITE_ON_EXISTS' => false,
+        'SF_SKIP_UPLOAD_ON_EXISTS' => true,
         'SF_ROUTES_ENABLED' => true,
     ];
 

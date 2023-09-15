@@ -1,7 +1,10 @@
-# Simple Files
+# Simple Files for Laravel 9|10
 
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Total Downloads][ico-downloads]][link-downloads]
+[![GitHub Repo stars][ico-stars]][link-stars]
+[![Discord][ico-discord]][link-discord]
+[![Twitter Follow][ico-twitter]][link-twitter]
 
 ![Simple Files Banner](./images/banner.png "Banner")
 
@@ -298,10 +301,17 @@ If you discover any security related issues, please email author@email.com inste
 
 MIT. Please see the [license file](license.md) for more information.
 
-[ico-version]: https://img.shields.io/packagist/v/luchavez/simple-files.svg?style=flat-square
-[ico-downloads]: https://img.shields.io/packagist/dt/luchavez/simple-files.svg?style=flat-square
+[ico-version]: https://img.shields.io/packagist/v/luchavez/simple-files.svg
+[ico-downloads]: https://img.shields.io/packagist/dt/luchavez/simple-files.svg
+[ico-stars]: https://img.shields.io/github/stars/luchavez-technologies/simple-files
+[ico-discord]: https://img.shields.io/discord/1143744619956404295?color=8c9eff&label=Discord&logo=discord
+[ico-twitter]: https://img.shields.io/twitter/follow/luchaveztech
 
 [link-packagist]: https://packagist.org/packages/luchavez/simple-files
 [link-downloads]: https://packagist.org/packages/luchavez/simple-files
+[link-stars]: https://github.com/luchavez-technologies/simple-files
+[link-discord]: https://discord.gg/MBxxAkQAxx
+[link-twitter]: https://twitter.com/luchaveztech
+
 [link-author]: https://github.com/luchavez-technologies
 [link-contributors]: ../../contributors

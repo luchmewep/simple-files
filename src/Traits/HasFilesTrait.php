@@ -3,14 +3,14 @@
 namespace Luchavez\SimpleFiles\Traits;
 
 use Illuminate\Contracts\Auth\Authenticatable as User;
-use Luchavez\SimpleFiles\Exceptions\FileUploadFailedException;
-use Luchavez\SimpleFiles\Models\File;
-use Luchavez\SimpleFiles\Models\Fileable;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
+use Luchavez\SimpleFiles\Exceptions\FileUploadFailedException;
+use Luchavez\SimpleFiles\Models\File;
+use Luchavez\SimpleFiles\Models\Fileable;
 
 /**
  * Trait HasFilesTrait
@@ -127,7 +127,7 @@ trait HasFilesTrait
      *
      * @throws FileUploadFailedException
      */
-    public function attachFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, User $user = null, ?array $description = null, bool $is_public = true, bool $preserve_name = false): void
+    public function attachFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, User $user = null, array $description = null, bool $is_public = true, bool $preserve_name = false): void
     {
         $this->syncFiles($file, $user, $description, false, $is_public, $preserve_name);
     }
@@ -141,7 +141,7 @@ trait HasFilesTrait
      *
      * @throws FileUploadFailedException
      */
-    public function attachPublicFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, User $user = null, ?array $description = null, bool $preserve_name = false): void
+    public function attachPublicFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, User $user = null, array $description = null, bool $preserve_name = false): void
     {
         $this->attachFiles($file, $user, $description, true, $preserve_name);
     }
@@ -155,7 +155,7 @@ trait HasFilesTrait
      *
      * @throws FileUploadFailedException
      */
-    public function attachPrivateFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, User $user = null, ?array $description = null, bool $preserve_name = false): void
+    public function attachPrivateFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, User $user = null, array $description = null, bool $preserve_name = false): void
     {
         $this->attachFiles($file, $user, $description, false, $preserve_name);
     }
@@ -171,7 +171,7 @@ trait HasFilesTrait
      *
      * @throws FileUploadFailedException
      */
-    public function syncFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, User $user = null, ?array $description = null, bool $detaching = true, bool $is_public = true, bool $preserve_name = false): void
+    public function syncFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, User $user = null, array $description = null, bool $detaching = true, bool $is_public = true, bool $preserve_name = false): void
     {
         $file = $this->collectFiles($file);
 
@@ -196,7 +196,7 @@ trait HasFilesTrait
      *
      * @throws FileUploadFailedException
      */
-    public function syncPublicFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, User $user = null, ?array $description = null, bool $detaching = true, bool $preserve_name = false): void
+    public function syncPublicFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, User $user = null, array $description = null, bool $detaching = true, bool $preserve_name = false): void
     {
         $this->syncFiles($file, $user, $description, $detaching, true, $preserve_name);
     }
@@ -211,7 +211,7 @@ trait HasFilesTrait
      *
      * @throws FileUploadFailedException
      */
-    public function syncPrivateFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, User $user = null, ?array $description = null, bool $detaching = true, bool $preserve_name = false): void
+    public function syncPrivateFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, User $user = null, array $description = null, bool $detaching = true, bool $preserve_name = false): void
     {
         $this->syncFiles($file, $user, $description, $detaching, false, $preserve_name);
     }

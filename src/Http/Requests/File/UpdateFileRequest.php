@@ -2,7 +2,7 @@
 
 namespace Luchavez\SimpleFiles\Http\Requests\File;
 
-use Luchavez\StarterKit\Requests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 /**
  * Class UpdateFileRequest
