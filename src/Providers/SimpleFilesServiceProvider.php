@@ -132,7 +132,7 @@ class SimpleFilesServiceProvider extends BaseStarterKitServiceProvider
         // Publishing the configuration file.
         $this->publishes(
             [
-                __DIR__.'/../config/simple-files.php' => config_path('simple-files.php'),
+                __DIR__.'/../../config/simple-files.php' => config_path('simple-files.php'),
             ],
             'simple-files.config'
         );
