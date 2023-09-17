@@ -318,7 +318,7 @@ class SimpleFiles
      */
     public function getContentsFromURL(string $file): ?string
     {
-        if (is_valid_url($file) && make_request($file)->executeHead(null)->ok() && $contents = file_get_contents($file)) {
+        if (is_valid_url($file) && simpleHttp($file)->head()->ok() && $contents = file_get_contents($file)) {
             return $contents;
         }
 
