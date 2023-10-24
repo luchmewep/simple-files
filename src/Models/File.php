@@ -4,23 +4,22 @@ namespace Luchavez\SimpleFiles\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Luchavez\SimpleFiles\Traits\HasFileFactoryTrait;
+use Luchavez\StarterKit\Traits\ModelOwnedTrait;
 use Luchavez\StarterKit\Traits\UsesUUIDTrait;
 
 /**
  * Class File
  *
- * @method static Builder image(bool $bool) Get image files.
+ * @method static Builder image(bool $bool = true) Get image files.
  * @method static Builder extension(string $extension) Get files with specific extension.
  *
  * @author James Carlo Luchavez <jamescarloluchavez@gmail.com>
  */
 class File extends Model
 {
-    use SoftDeletes;
     use UsesUUIDTrait;
+    use ModelOwnedTrait;
     use HasFileFactoryTrait;
 
     /**
@@ -31,20 +30,6 @@ class File extends Model
     public function getRouteKeyName(): string
     {
         return 'uuid';
-    }
-
-    /***** RELATIONSHIPS *****/
-
-    /**
-     * @return BelongsTo|null
-     */
-    public function user(): ?BelongsTo
-    {
-        if ($userModel = starterKit()->getUserModel()) {
-            return $this->belongsTo($userModel);
-        }
-
-        return null;
     }
 
     /***** SCOPES *****/

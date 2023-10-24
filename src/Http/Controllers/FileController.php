@@ -6,15 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
-use Luchavez\SimpleFiles\Events\File\FileArchivedEvent;
-use Luchavez\SimpleFiles\Events\File\FileCollectedEvent;
-use Luchavez\SimpleFiles\Events\File\FileRestoredEvent;
-use Luchavez\SimpleFiles\Events\File\FileShownEvent;
-use Luchavez\SimpleFiles\Events\File\FileUpdatedEvent;
 use Luchavez\SimpleFiles\Exceptions\FileUploadFailedException;
 use Luchavez\SimpleFiles\Http\Requests\File\DeleteFileRequest;
 use Luchavez\SimpleFiles\Http\Requests\File\IndexFileRequest;
-use Luchavez\SimpleFiles\Http\Requests\File\RestoreFileRequest;
 use Luchavez\SimpleFiles\Http\Requests\File\ShowFileRequest;
 use Luchavez\SimpleFiles\Http\Requests\File\StoreFileRequest;
 use Luchavez\SimpleFiles\Http\Requests\File\UpdateFileRequest;
@@ -50,8 +44,6 @@ class FileController extends Controller
         } else {
             $data = $data->simplePaginate($request->get('per_page', 15));
         }
-
-        event(new FileCollectedEvent($data));
 
         return simpleResponse()
             ->data($data)
@@ -103,11 +95,9 @@ class FileController extends Controller
      */
     public function show(ShowFileRequest $request, File $file): JsonResponse
     {
-        if (! ($user = $request->user()) || (($owner = $file->user) && $owner->isNot($user))) {
+        if (! ($user = $request->user()) || $file->owner()->isNot($user)) {
             throw new AuthorizationException();
         }
-
-        event(new FileShownEvent($file));
 
         return simpleResponse()
             ->data($file)
@@ -129,13 +119,11 @@ class FileController extends Controller
      */
     public function update(UpdateFileRequest $request, File $file): JsonResponse
     {
-        if (! ($user = $request->user()) || (($owner = $file->user) && $owner->isNot($user))) {
+        if (! ($user = $request->user()) || $file->owner()->isNot($user)) {
             throw new AuthorizationException();
         }
 
         $file->touch(); // trigger FileObserver's saving event...
-
-        event(new FileUpdatedEvent($file));
 
         return simpleResponse()
             ->data($file)
@@ -157,47 +145,15 @@ class FileController extends Controller
      */
     public function destroy(DeleteFileRequest $request, File $file): JsonResponse
     {
-        if (! ($user = $request->user()) || (($owner = $file->user) && $owner->isNot($user))) {
+        if (! ($user = $request->user()) || $file->owner()->isNot($user)) {
             throw new AuthorizationException();
         }
 
         $file->delete();
 
-        event(new FileArchivedEvent($file));
-
         return simpleResponse()
             ->data($file)
             ->message('Successfully archived record.')
-            ->success()
-            ->generate();
-    }
-
-    /**
-     * Restore File
-     *
-     * @group File Management
-     *
-     * @param  RestoreFileRequest  $request
-     * @param $file
-     * @return JsonResponse
-     *
-     * @throws AuthorizationException
-     */
-    public function restore(RestoreFileRequest $request, $file): JsonResponse
-    {
-        $file = File::withTrashed()->where('uuid', $file)->firstOrFail();
-
-        if (! ($user = $request->user()) || (($owner = $file->user) && $owner->isNot($user))) {
-            throw new AuthorizationException();
-        }
-
-        $file->restore();
-
-        event(new FileRestoredEvent($file));
-
-        return simpleResponse()
-            ->data($file)
-            ->message('Successfully restored record.')
             ->success()
             ->generate();
     }

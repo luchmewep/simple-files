@@ -26,7 +26,7 @@ class FileDataFactory extends BaseDataFactory
     /**
      * @var int|string|null
      */
-    public int|string|null $user_id = null;
+    public int|string|null $owner_id = null;
 
     /**
      * @var string|null
