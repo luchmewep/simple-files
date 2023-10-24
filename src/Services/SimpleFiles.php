@@ -178,8 +178,8 @@ class SimpleFiles
         $factory = new FileDataFactory();
 
         $factory->is_public = $is_public;
-        $factory->user_id = $user?->id;
-        $folder = $factory->user_id;
+        $factory->owner_id = $user?->id;
+        $folder = $factory->owner_id;
         $factory->name = Str::random(40);
 
         // Upload File and UploadedFile instances to Storage

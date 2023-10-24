@@ -29,7 +29,7 @@ return new class() extends Migration
             static function (Blueprint $table) {
                 $table->id();
                 $table->uuid('uuid')->unique();
-                $table->foreignIdFor(starterKit()->getUserModel())->nullable()->constrained();
+                $table->owned(); // from luchavez/starter-kit
                 $table->boolean('is_public')->nullable();
                 $table->string('path');
                 $table->string('name');
@@ -39,7 +39,6 @@ return new class() extends Migration
                 $table->text('url')->nullable();
                 $table->timestamp('url_expires_at')->nullable();
                 $table->unique(['is_public', 'path'], 'files_unique_path');
-                $table->softDeletes();
                 $table->timestamps();
             }
         );

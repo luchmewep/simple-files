@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 use Luchavez\SimpleFiles\Console\Commands\SyncFilesCommand;
 use Luchavez\SimpleFiles\Models\File;
 use Luchavez\SimpleFiles\Observers\FileObserver;
-use Luchavez\SimpleFiles\Repositories\FileRepository;
 use Luchavez\SimpleFiles\Services\SimpleFiles;
 use Luchavez\StarterKit\Abstracts\BaseStarterKitServiceProvider;
 
@@ -58,9 +57,7 @@ class SimpleFilesServiceProvider extends BaseStarterKitServiceProvider
      *
      * @var array
      */
-    protected array $repository_map = [
-        FileRepository::class => File::class,
-    ];
+    protected array $repository_map = [];
 
     /**
      * Publishable Environment Variables
@@ -88,7 +85,7 @@ class SimpleFilesServiceProvider extends BaseStarterKitServiceProvider
     {
         parent::boot();
 
-        if ($userModel = starter_kit()->getUserModel()) {
+        if ($userModel = starterKit()->getUserModel()) {
             $userModel::resolveRelationUsing('uploadedFiles', function (Model $model) {
                 return $model->hasMany(File::class);
             });
@@ -165,7 +162,10 @@ class SimpleFilesServiceProvider extends BaseStarterKitServiceProvider
         return config('simple-files.routes_enabled');
     }
 
-    public function registerCustomDisks()
+    /**
+     * @return void
+     */
+    public function registerCustomDisks(): void
     {
         // Cancel if config is cached
         if ($this->app->configurationIsCached()) {
