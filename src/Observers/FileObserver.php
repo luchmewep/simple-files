@@ -19,7 +19,7 @@ class FileObserver
      */
     public function saving(File $file): void
     {
-        simpleFiles()->generateUrl($file);
+        $file->generateUrl();
     }
 
     /**

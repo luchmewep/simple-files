@@ -2,6 +2,7 @@
 
 namespace Luchavez\SimpleFiles\Services;
 
+use DateTimeInterface;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Authenticatable as User;
 use Illuminate\Contracts\Filesystem\Filesystem;
@@ -43,17 +44,9 @@ class SimpleFiles
     /**
      * @return string
      */
-    public function getFilesystemDisk(): string
+    public function getDefaultDisk(): string
     {
         return config('simple-files.default_disk');
-    }
-
-    /**
-     * @return string
-     */
-    public function getDisk(): string
-    {
-        return $this->getFilesystemDisk();
     }
 
     /**
@@ -65,11 +58,22 @@ class SimpleFiles
     }
 
     /**
+     * @param  bool  $is_public
+     * @return string
+     */
+    public function getDirectory(bool $is_public): string
+    {
+        $key = 'simple-files.directory.'.($is_public ? 'public' : 'private');
+
+        return trim(config($key), '/');
+    }
+
+    /**
      * @return string
      */
     public function getPublicDirectory(): string
     {
-        return trim(config('simple-files.directory.public'), '/');
+        return $this->getDirectory(true);
     }
 
     /**
@@ -77,7 +81,7 @@ class SimpleFiles
      */
     public function getPrivateDirectory(): string
     {
-        return trim(config('simple-files.directory.private'), '/');
+        return $this->getDirectory(false);
     }
 
     /**
@@ -101,18 +105,26 @@ class SimpleFiles
     /**
      * @param  bool|null  $is_public
      * @param  bool  $read_only
+     * @return string
+     */
+    public function getDisk(bool $is_public = null, bool $read_only = false): string
+    {
+        if (is_null($is_public)) {
+            return $this->getDefaultDisk();
+        }
+
+        // Example: sf-public-ro
+        return collect(['sf', $is_public ? 'public' : 'private', $read_only ? 'ro' : null])->filter()->join('-');
+    }
+
+    /**
+     * @param  bool|null  $is_public
+     * @param  bool  $read_only
      * @return Filesystem
      */
     public function getFilesystemAdapter(bool $is_public = null, bool $read_only = false): Filesystem
     {
-        if (is_null($is_public)) {
-            $disk = $this->getDisk();
-        } else {
-            // Example: sf-public-ro
-            $disk = collect(['sf', $is_public ? 'public' : 'private', $read_only ? 'ro' : null])->filter()->join('-');
-        }
-
-        return Storage::disk($disk);
+        return Storage::disk($this->getDisk(is_public: $is_public, read_only: $read_only));
     }
 
     /**
@@ -643,11 +655,9 @@ class SimpleFiles
         // If file exists and is private but url_expires_at is not yet set, generate url
         // If file exists and is private and url_expires_at is set but url_expires_at is <= to now(), generate url
 
-        $exists = false;
+        $exists = $file->exists();
 
-        if ((! isset($file->created_at) || isset($file->url)) &&
-            ! ($exists = $adapter->exists(path: $file->path))
-        ) {
+        if ((! isset($file->created_at) || isset($file->url)) && ! $exists) {
             $file->url = null;
             $file->url_expires_at = null;
         }
@@ -667,5 +677,24 @@ class SimpleFiles
                 }
             }
         }
+    }
+
+    /**
+     * @param  bool  $is_public
+     * @param  string  $path
+     * @param  DateTimeInterface|null  $expiration
+     * @return string
+     */
+    public function url(bool $is_public, string $path, DateTimeInterface $expiration = null): string
+    {
+        $adapter = $this->getFilesystemAdapter($is_public);
+
+        if ($is_public) {
+            return $adapter->url($path);
+        }
+
+        $expiration ??= $this->getExpireAfter();
+
+        return $adapter->temporaryUrl($path, $expiration);
     }
 }
