@@ -95,9 +95,8 @@ class SyncFilesCommand extends Command
      */
     public function syncFiles(bool $is_public): void
     {
-        $directory = $is_public ? simpleFiles()->getPublicDirectory() : simpleFiles()->getPrivateDirectory();
-
-        $files = simpleFiles()->getFilesystemAdapter()->listContents($directory, true)
+        $files = simpleFiles()->getFilesystemAdapter($is_public, true)
+            ->listContents('', true)
             ->filter(fn (StorageAttributes $attributes) => $attributes->isFile());
 
         $now = now('utc')->toDateTimeString();
@@ -113,6 +112,7 @@ class SyncFilesCommand extends Command
                 $name = $path->afterLast('/');
 
                 $metadata['uuid'] = Str::uuid();
+                $metadata['is_public'] = $is_public;
                 $metadata['path'] = $path;
                 $metadata['name'] = $name;
                 $metadata['size'] = $file->fileSize();
@@ -134,11 +134,11 @@ class SyncFilesCommand extends Command
                     $metadata['mime_type'] = 'application/x-empty';
                 }
 
-                if ($is_public) {
-                    $metadata['url'] = simpleFiles()->getFilesystemAdapter()->url($path);
-                } else {
-                    $url_expires_at = simpleFiles()->getExpireAfter();
-                    $metadata['url'] = simpleFiles()->getFilesystemAdapter()->temporaryUrl($path, $url_expires_at);
+                // URL-related
+                $url_expires_at = simpleFiles()->getExpireAfter();
+                $metadata['url'] = simpleFiles()->url($is_public, $path, $url_expires_at);
+
+                if (! $is_public) {
                     $metadata['url_expires_at'] = $url_expires_at;
                 }
 
