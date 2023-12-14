@@ -95,7 +95,7 @@ class SyncFilesCommand extends Command
      */
     public function syncFiles(bool $is_public): void
     {
-        $files = simpleFiles()->getFilesystemAdapter($is_public, true)
+        $files = simpleFiles()->disk($is_public, true)
             ->listContents('', true)
             ->filter(fn (StorageAttributes $attributes) => $attributes->isFile());
 
