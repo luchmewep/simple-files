@@ -166,17 +166,20 @@ class SimpleFilesServiceProvider extends BaseStarterKitServiceProvider
 
             // Scoped or not
             if ($prefix) {
-                $default_config[$disk_name]['driver'] = 'scoped';
-                $default_config[$disk_name]['disk'] = $disk;
-                $default_config[$disk_name]['prefix'] = $prefix;
+                $details = [
+                    'driver' => 'scoped',
+                    'disk' => $disk,
+                    'prefix' => $prefix,
+                ];
             } else {
-                $default_config[$disk_name]['driver'] = $disk;
+                $details = ['driver' => $disk];
             }
 
+            $default_config[$disk_name] = $details;
+
             // Read-only
-            $read_disk = $disk_name.'-ro';
-            $default_config[$read_disk]['driver'] = $disk_name;
-            $default_config[$read_disk]['read-only'] = true;
+            $details['read-only'] = true;
+            $default_config[$disk_name.'-ro'] = $details;
         }
 
         // Set the new $default_config to config

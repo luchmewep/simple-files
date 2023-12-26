@@ -110,23 +110,30 @@ class SimpleFiles
      * @param  bool  $preserve_name
      * @param  bool  $return_as_model
      * @param  array  $options
-     * @return File|Builder|array|null
+     * @return File|Builder|FileDataFactory|Collection|null
      *
      * @throws FileUploadFailedException
      */
     public function store(
+        bool $is_public,
         Collection|UploadedFile|\Illuminate\Http\File|array|string $file,
         ?Authenticatable $user = null,
-        bool $is_public = true,
         bool $preserve_name = false,
         bool $return_as_model = true,
         array $options = []
-    ): File|Builder|Collection|null {
+    ): File|Builder|FileDataFactory|Collection|null {
         // If no user is provided, get the auth()->user()
         $user ??= auth()->user();
 
         if ($file instanceof Collection || is_array($file)) {
-            return collect($file)->map(fn ($f) => $this->store($f, $user, $is_public, $preserve_name, $return_as_model, $options));
+            return collect($file)->map(fn ($f) => $this->store(
+                is_public: $is_public,
+                file: $f,
+                user: $user,
+                preserve_name: $preserve_name,
+                return_as_model: $return_as_model,
+                options: $options
+            ));
         }
 
         // Prepare data factory
@@ -207,7 +214,7 @@ class SimpleFiles
         if (isset($factory->path)) {
             $factory->size = $this->disk(is_public: $is_public)->size($factory->path);
 
-            return $return_as_model ? $factory->updateOrCreate() : $factory->toArray();
+            return $return_as_model ? $factory->updateOrCreate() : $factory;
         }
 
         return null;
@@ -219,7 +226,7 @@ class SimpleFiles
      * @param  bool  $preserve_name
      * @param  bool  $return_as_model
      * @param  array  $options
-     * @return File|Builder|Collection|null
+     * @return File|Builder|FileDataFactory|Collection|null
      *
      * @throws FileUploadFailedException
      */
@@ -229,11 +236,11 @@ class SimpleFiles
         bool $preserve_name = false,
         bool $return_as_model = true,
         array $options = []
-    ): File|Builder|Collection|null {
+    ): File|Builder|FileDataFactory|Collection|null {
         return $this->store(
+            is_public: true,
             file: $file,
             user: $user,
-            is_public: true,
             preserve_name: $preserve_name,
             return_as_model: $return_as_model,
             options: $options
@@ -246,7 +253,7 @@ class SimpleFiles
      * @param  bool  $preserve_name
      * @param  bool  $return_as_model
      * @param  array  $options
-     * @return File|Builder|Collection|null
+     * @return File|Builder|FileDataFactory|Collection|null
      *
      * @throws FileUploadFailedException
      */
@@ -256,11 +263,11 @@ class SimpleFiles
         bool $preserve_name = false,
         bool $return_as_model = true,
         array $options = []
-    ): File|Builder|Collection|null {
+    ): File|Builder|FileDataFactory|Collection|null {
         return $this->store(
+            is_public: false,
             file: $file,
             user: $user,
-            is_public: false,
             preserve_name: $preserve_name,
             return_as_model: $return_as_model,
             options: $options
@@ -361,7 +368,7 @@ class SimpleFiles
     /**
      * @param  bool  $is_public
      * @param  string  $path
-     * @param string|resource $contents
+     * @param  string|resource  $contents
      * @param  mixed  $options
      * @return string|null
      */
@@ -372,7 +379,7 @@ class SimpleFiles
 
     /**
      * @param  string  $path
-     * @param string|resource $contents
+     * @param  string|resource  $contents
      * @param  mixed  $options
      * @return string|null
      */
@@ -383,7 +390,7 @@ class SimpleFiles
 
     /**
      * @param  string  $path
-     * @param string|resource $contents
+     * @param  string|resource  $contents
      * @param  mixed  $options
      * @return string|null
      */

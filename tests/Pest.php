@@ -11,22 +11,14 @@
 |
 */
 
-uses(Tests\TestCase::class)->in('Feature');
+use Illuminate\Http\Testing\File;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
-/*
-|--------------------------------------------------------------------------
-| Expectations
-|--------------------------------------------------------------------------
-|
-| When you're writing tests, you often need to check that values meet certain conditions. The
-| "expect()" function gives you access to a set of "expectations" methods that you can use
-| to assert different things. Of course, you may extend the Expectation API at any time.
-|
-*/
-
-expect()->extend('toBeOne', function () {
-    return $this->toBe(1);
-});
+uses(
+    Tests\TestCase::class,
+    Illuminate\Foundation\Testing\RefreshDatabase::class,
+)->in('Feature');
 
 /*
 |--------------------------------------------------------------------------
@@ -39,7 +31,20 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+function setPrefix(bool $is_public, ?string $prefix): void
 {
-    // ..
+    config(['simple-files.'.($is_public ? 'public' : 'private').'.prefix' => $prefix]);
+}
+
+function setupFakeStorages(): void
+{
+    foreach ([true, false] as $is_public) {
+        Storage::fake(simpleFiles()->getDiskName($is_public));
+        Storage::fake(simpleFiles()->getDiskName($is_public, true));
+    }
+}
+
+function createFakeImage(string $file_name): File
+{
+    return UploadedFile::fake()->image($file_name, 1000, 1000);
 }
