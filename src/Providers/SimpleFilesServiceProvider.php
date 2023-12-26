@@ -67,13 +67,13 @@ class SimpleFilesServiceProvider extends BaseStarterKitServiceProvider
      * @var array
      */
     protected array $env_vars = [
-        'SF_FILESYSTEM_DISK' => '${FILESYSTEM_DISK}',
+        'SF_PUBLIC_DISK' => '${FILESYSTEM_DISK}',
+        'SF_PUBLIC_PREFIX' => 'public',
+        'SF_PRIVATE_DISK' => '${FILESYSTEM_DISK}',
+        'SF_PRIVATE_PREFIX' => 'private',
         'SF_EXPIRE_AFTER' => '1 day',
-        'SF_PUBLIC_DIRECTORY' => 'public',
-        'SF_PRIVATE_DIRECTORY' => 'private',
         'SF_OVERWRITE_ON_EXISTS' => false,
         'SF_SKIP_UPLOAD_ON_EXISTS' => true,
-        'SF_ROUTES_ENABLED' => true,
     ];
 
     /**
@@ -85,8 +85,8 @@ class SimpleFilesServiceProvider extends BaseStarterKitServiceProvider
     {
         parent::boot();
 
-        if ($userModel = starterKit()->getUserModel()) {
-            $userModel::resolveRelationUsing('uploadedFiles', function (Model $model) {
+        if ($user_model = starterKit()->getUserModel()) {
+            $user_model::resolveRelationUsing('uploadedFiles', function (Model $model) {
                 return $model->hasMany(File::class);
             });
         }
@@ -139,27 +139,11 @@ class SimpleFilesServiceProvider extends BaseStarterKitServiceProvider
     }
 
     /**
-     * @return string|null
-     */
-    public function getRoutePrefix(): ?string
-    {
-        return 'simple-files';
-    }
-
-    /**
      * @return bool
      */
     public function areConfigsEnabled(): bool
     {
         return false;
-    }
-
-    /**
-     * @return bool
-     */
-    public function areRoutesEnabled(): bool
-    {
-        return config('simple-files.routes_enabled');
     }
 
     /**
@@ -173,33 +157,32 @@ class SimpleFilesServiceProvider extends BaseStarterKitServiceProvider
         }
 
         // Copy default configs
-        $config = config('filesystems.disks');
-        $default_disk = config('filesystems.default');
+        $default_config = config('filesystems.disks');
 
-        // Prepare custom disks configs
-        $custom_disks = [
-            'sf-public' => [
-                'driver' => 'scoped',
-                'disk' => $default_disk,
-                'prefix' => simpleFiles()->getPublicDirectory(),
-            ],
-            'sf-private' => [
-                'driver' => 'scoped',
-                'disk' => $default_disk,
-                'prefix' => simpleFiles()->getPrivateDirectory(),
-            ],
-        ];
+        foreach ([true, false] as $bool) {
+            $disk_name = $bool ? 'sf-public' : 'sf-private';
+            $disk = simpleFiles()->getDriver($bool);
+            $prefix = simpleFiles()->getPrefix($bool);
 
-        // Add to $config
-        foreach ($custom_disks as $driver => $details) {
-            $config[$driver] = $details;
+            // Scoped or not
+            if ($prefix) {
+                $details = [
+                    'driver' => 'scoped',
+                    'disk' => $disk,
+                    'prefix' => $prefix,
+                ];
+            } else {
+                $details = ['driver' => $disk];
+            }
 
-            // Add read only option
+            $default_config[$disk_name] = $details;
+
+            // Read-only
             $details['read-only'] = true;
-            $config[$driver.'-ro'] = $details;
+            $default_config[$disk_name.'-ro'] = $details;
         }
 
-        // Set the new $config to config
-        config(['filesystems.disks' => $config]);
+        // Set the new $default_config to config
+        config(['filesystems.disks' => $default_config]);
     }
 }

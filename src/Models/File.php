@@ -23,9 +23,9 @@ use Luchavez\StarterKit\Traits\UsesUUIDTrait;
  */
 class File extends Model implements Attachable
 {
-    use UsesUUIDTrait;
-    use ModelOwnedTrait;
     use HasFileFactoryTrait;
+    use ModelOwnedTrait;
+    use UsesUUIDTrait;
 
     /**
      * Get the route key for the model.
@@ -104,7 +104,7 @@ class File extends Model implements Attachable
      */
     public function toMailAttachment(): \Illuminate\Mail\Attachment
     {
-        $disk = simpleFiles()->getDisk(is_public: $this->is_public, read_only: true);
+        $disk = simpleFiles()->getDiskName(is_public: $this->is_public, read_only: true);
 
         return Attachment::fromStorageDisk(disk: $disk, path: $this->path);
     }
@@ -117,7 +117,7 @@ class File extends Model implements Attachable
      */
     protected function getFilesystemAdapter(bool $read_only = false): Filesystem
     {
-        return simpleFiles()->getFilesystemAdapter(is_public: $this->is_public, read_only: $read_only);
+        return simpleFiles()->disk(is_public: $this->is_public, read_only: $read_only);
     }
 
     /**
