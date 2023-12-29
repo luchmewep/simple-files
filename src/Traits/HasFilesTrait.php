@@ -127,7 +127,7 @@ trait HasFilesTrait
      *
      * @throws FileUploadFailedException
      */
-    public function attachFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, User $user = null, array $description = null, bool $is_public = true, bool $preserve_name = false): void
+    public function attachFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, ?User $user = null, ?array $description = null, bool $is_public = true, bool $preserve_name = false): void
     {
         $this->syncFiles($file, $user, $description, false, $is_public, $preserve_name);
     }
@@ -141,7 +141,7 @@ trait HasFilesTrait
      *
      * @throws FileUploadFailedException
      */
-    public function attachPublicFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, User $user = null, array $description = null, bool $preserve_name = false): void
+    public function attachPublicFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, ?User $user = null, ?array $description = null, bool $preserve_name = false): void
     {
         $this->attachFiles($file, $user, $description, true, $preserve_name);
     }
@@ -155,7 +155,7 @@ trait HasFilesTrait
      *
      * @throws FileUploadFailedException
      */
-    public function attachPrivateFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, User $user = null, array $description = null, bool $preserve_name = false): void
+    public function attachPrivateFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, ?User $user = null, ?array $description = null, bool $preserve_name = false): void
     {
         $this->attachFiles($file, $user, $description, false, $preserve_name);
     }
@@ -171,7 +171,7 @@ trait HasFilesTrait
      *
      * @throws FileUploadFailedException
      */
-    public function syncFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, User $user = null, array $description = null, bool $detaching = true, bool $is_public = true, bool $preserve_name = false): void
+    public function syncFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, ?User $user = null, ?array $description = null, bool $detaching = true, bool $is_public = true, bool $preserve_name = false): void
     {
         $file = $this->collectFiles($file);
 
@@ -196,7 +196,7 @@ trait HasFilesTrait
      *
      * @throws FileUploadFailedException
      */
-    public function syncPublicFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, User $user = null, array $description = null, bool $detaching = true, bool $preserve_name = false): void
+    public function syncPublicFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, ?User $user = null, ?array $description = null, bool $detaching = true, bool $preserve_name = false): void
     {
         $this->syncFiles($file, $user, $description, $detaching, true, $preserve_name);
     }
@@ -211,7 +211,7 @@ trait HasFilesTrait
      *
      * @throws FileUploadFailedException
      */
-    public function syncPrivateFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, User $user = null, array $description = null, bool $detaching = true, bool $preserve_name = false): void
+    public function syncPrivateFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, ?User $user = null, ?array $description = null, bool $detaching = true, bool $preserve_name = false): void
     {
         $this->syncFiles($file, $user, $description, $detaching, false, $preserve_name);
     }
@@ -226,7 +226,7 @@ trait HasFilesTrait
      *
      * @throws FileUploadFailedException
      */
-    public function detachFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, User $user = null, bool $touch = true, bool $is_public = true, bool $preserve_name = false): void
+    public function detachFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, ?User $user = null, bool $touch = true, bool $is_public = true, bool $preserve_name = false): void
     {
         $file = $this->collectFiles($file);
 
@@ -249,7 +249,7 @@ trait HasFilesTrait
      *
      * @throws FileUploadFailedException
      */
-    public function detachPublicFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, User $user = null, bool $touch = true, bool $preserve_name = false): void
+    public function detachPublicFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, ?User $user = null, bool $touch = true, bool $preserve_name = false): void
     {
         $this->detachFiles($file, $user, $touch, true, $preserve_name);
     }
@@ -263,7 +263,7 @@ trait HasFilesTrait
      *
      * @throws FileUploadFailedException
      */
-    public function detachPrivateFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, User $user = null, bool $touch = true, bool $preserve_name = false): void
+    public function detachPrivateFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, ?User $user = null, bool $touch = true, bool $preserve_name = false): void
     {
         $this->detachFiles($file, $user, $touch, false, $preserve_name);
     }
