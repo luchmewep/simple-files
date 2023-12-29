@@ -10,6 +10,7 @@ use Illuminate\Mail\Mailables\Attachment;
 use Luchavez\SimpleFiles\Traits\HasFileFactoryTrait;
 use Luchavez\StarterKit\Traits\ModelOwnedTrait;
 use Luchavez\StarterKit\Traits\UsesUUIDTrait;
+use Spatie\Tags\HasTags;
 
 /**
  * Class File
@@ -24,6 +25,7 @@ use Luchavez\StarterKit\Traits\UsesUUIDTrait;
 class File extends Model implements Attachable
 {
     use HasFileFactoryTrait;
+    use HasTags;
     use ModelOwnedTrait;
     use UsesUUIDTrait;
 

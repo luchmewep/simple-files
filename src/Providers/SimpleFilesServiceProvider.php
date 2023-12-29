@@ -3,6 +3,7 @@
 namespace Luchavez\SimpleFiles\Providers;
 
 use Illuminate\Database\Eloquent\Model;
+use Luchavez\SimpleFiles\Console\Commands\InstallCommand;
 use Luchavez\SimpleFiles\Console\Commands\SyncFilesCommand;
 use Luchavez\SimpleFiles\Models\File;
 use Luchavez\SimpleFiles\Observers\FileObserver;
@@ -13,6 +14,7 @@ class SimpleFilesServiceProvider extends BaseStarterKitServiceProvider
 {
     protected array $commands = [
         SyncFilesCommand::class,
+        InstallCommand::class,
     ];
 
     /**
@@ -91,7 +93,7 @@ class SimpleFilesServiceProvider extends BaseStarterKitServiceProvider
             });
         }
 
-        $this->registerCustomDisks();
+        $this->bootCustomDisks();
     }
 
     /**
@@ -149,7 +151,7 @@ class SimpleFilesServiceProvider extends BaseStarterKitServiceProvider
     /**
      * @return void
      */
-    public function registerCustomDisks(): void
+    public function bootCustomDisks(): void
     {
         // Cancel if config is cached
         if ($this->app->configurationIsCached()) {

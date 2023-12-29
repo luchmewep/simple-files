@@ -49,6 +49,11 @@ class FileDataFactory extends BaseDataFactory
     public ?string $size;
 
     /**
+     * @var string[]
+     */
+    public array $tags = [];
+
+    /**
      * @var string|null
      */
     public ?string $deleted_at;

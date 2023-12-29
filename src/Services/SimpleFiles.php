@@ -104,11 +104,12 @@ class SimpleFiles
      * If the user is not supplied, this will attempt to get user from auth helper.
      * If you choose to preserve original file name, this will check if file already exists.
      *
+     * @param  bool  $is_public
      * @param  Collection|UploadedFile[]|\Illuminate\Http\File[]|string[]|UploadedFile|\Illuminate\Http\File|string  $file
      * @param  User|null  $user
-     * @param  bool  $is_public
      * @param  bool  $preserve_name
      * @param  bool  $return_as_model
+     * @param  string[]  $tags
      * @param  array  $options
      * @return File|Builder|FileDataFactory|Collection|null
      *
@@ -120,6 +121,7 @@ class SimpleFiles
         ?Authenticatable $user = null,
         bool $preserve_name = false,
         bool $return_as_model = true,
+        array $tags = [],
         array $options = []
     ): File|Builder|FileDataFactory|Collection|null {
         // If no user is provided, get the auth()->user()
@@ -138,6 +140,9 @@ class SimpleFiles
 
         // Prepare data factory
         $factory = new FileDataFactory();
+
+        // Add tags
+        $factory->tags = $tags;
 
         $factory->is_public = $is_public;
         $factory->owner_id = $user?->getAuthIdentifier();
@@ -225,6 +230,7 @@ class SimpleFiles
      * @param  User|null  $user
      * @param  bool  $preserve_name
      * @param  bool  $return_as_model
+     * @param  string[]  $tags
      * @param  array  $options
      * @return File|Builder|FileDataFactory|Collection|null
      *
@@ -235,6 +241,7 @@ class SimpleFiles
         ?User $user = null,
         bool $preserve_name = false,
         bool $return_as_model = true,
+        array $tags = [],
         array $options = []
     ): File|Builder|FileDataFactory|Collection|null {
         return $this->store(
@@ -243,6 +250,7 @@ class SimpleFiles
             user: $user,
             preserve_name: $preserve_name,
             return_as_model: $return_as_model,
+            tags: $tags,
             options: $options
         );
     }
@@ -252,6 +260,7 @@ class SimpleFiles
      * @param  User|null  $user
      * @param  bool  $preserve_name
      * @param  bool  $return_as_model
+     * @param  string[]  $tags
      * @param  array  $options
      * @return File|Builder|FileDataFactory|Collection|null
      *
@@ -262,6 +271,7 @@ class SimpleFiles
         ?User $user = null,
         bool $preserve_name = false,
         bool $return_as_model = true,
+        array $tags = [],
         array $options = []
     ): File|Builder|FileDataFactory|Collection|null {
         return $this->store(
@@ -270,6 +280,7 @@ class SimpleFiles
             user: $user,
             preserve_name: $preserve_name,
             return_as_model: $return_as_model,
+            tags: $tags,
             options: $options
         );
     }

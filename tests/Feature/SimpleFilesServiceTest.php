@@ -146,4 +146,19 @@ it('appends random string when preserve file name is true and skipping on exists
     ->with('public-private')
     ->with('prefix');
 
-//test('can upload files with tags');
+it('can upload files with tags', function (bool $is_public, ?string $prefix = null) {
+    setPrefix($is_public, $prefix);
+
+    $file_name = Str::random(10).'.jpg';
+    $file = createFakeImage($file_name);
+    $tags = ['tag1', 'tag2'];
+    try {
+        $result = simpleFiles()->store(is_public: $is_public, file: $file, tags: $tags);
+
+        expect($result)->toBeInstanceOf(File::class)
+            ->and(File::withAllTags($tags)->whereKey($result)->exists())->toBeTrue();
+    } catch (FileUploadFailedException) {
+    }
+})
+    ->with('public-private')
+    ->with('prefix');

@@ -29,7 +29,6 @@ return new class() extends Migration
             $table->id();
             $table->morphs('fileable');
             $table->foreignIdFor(File::class)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->string('description')->nullable();
             $table->timestamps();
         });
     }
