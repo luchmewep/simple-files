@@ -174,7 +174,7 @@ class SimpleFilesServiceProvider extends BaseStarterKitServiceProvider
                     'prefix' => $prefix,
                 ];
             } else {
-                $details = ['driver' => $disk];
+                $details = $default_config[$disk] ?? null;
             }
 
             $default_config[$disk_name] = $details;
