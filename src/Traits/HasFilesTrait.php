@@ -28,7 +28,7 @@ trait HasFilesTrait
      */
     public function files(): MorphToMany
     {
-        return $this->morphToMany(File::class, 'fileable')->withPivot('description')->withTimestamps()->using(Fileable::class)->latest('updated_at');
+        return $this->morphToMany(File::class, 'fileable')->withTimestamps()->using(Fileable::class)->latest('updated_at');
     }
 
     /**
@@ -118,70 +118,69 @@ trait HasFilesTrait
     /***** OTHER FUNCTIONS *****/
 
     /**
-     * @param  \Illuminate\Http\File|File|Collection|UploadedFile|array|string  $file
-     * @param  User|null  $user
-     * @param  array|null  $description
      * @param  bool  $is_public
+     * @param  \Illuminate\Http\File|File|Collection|UploadedFile|array|string  $file
+     * @param  User|null  $user
+     * @param  string[]  $tags
      * @param  bool  $preserve_name
      * @return void
      *
      * @throws FileUploadFailedException
      */
-    public function attachFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, ?User $user = null, ?array $description = null, bool $is_public = true, bool $preserve_name = false): void
+    public function attachFiles(bool $is_public, \Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, ?User $user = null, bool $preserve_name = false, array $tags = []): void
     {
-        $this->syncFiles($file, $user, $description, false, $is_public, $preserve_name);
+        $this->syncFiles(is_public: $is_public, file: $file, user: $user, detaching: false, preserve_name: $preserve_name, tags: $tags);
     }
 
     /**
      * @param  \Illuminate\Http\File|File|Collection|UploadedFile|array|string  $file
      * @param  User|null  $user
-     * @param  array|null  $description
+     * @param  string[]  $tags
      * @param  bool  $preserve_name
      * @return void
      *
      * @throws FileUploadFailedException
      */
-    public function attachPublicFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, ?User $user = null, ?array $description = null, bool $preserve_name = false): void
+    public function attachPublicFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, ?User $user = null, bool $preserve_name = false, array $tags = []): void
     {
-        $this->attachFiles($file, $user, $description, true, $preserve_name);
+        $this->attachFiles(is_public: true, file: $file, user: $user, preserve_name: $preserve_name, tags: $tags);
     }
 
     /**
      * @param  \Illuminate\Http\File|File|Collection|UploadedFile|array|string  $file
      * @param  User|null  $user
-     * @param  array|null  $description
+     * @param  string[]  $tags
      * @param  bool  $preserve_name
      * @return void
      *
      * @throws FileUploadFailedException
      */
-    public function attachPrivateFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, ?User $user = null, ?array $description = null, bool $preserve_name = false): void
+    public function attachPrivateFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, ?User $user = null, bool $preserve_name = false, array $tags = []): void
     {
-        $this->attachFiles($file, $user, $description, false, $preserve_name);
+        $this->attachFiles(is_public: false, file: $file, user: $user, preserve_name: $preserve_name, tags: $tags);
     }
 
     /**
+     * @param  bool  $is_public
      * @param  \Illuminate\Http\File|File|Collection|UploadedFile|array|string  $file
      * @param  User|null  $user
-     * @param  array|null  $description
+     * @param  string[]  $tags
      * @param  bool  $detaching
-     * @param  bool  $is_public
      * @param  bool  $preserve_name
      * @return void
      *
      * @throws FileUploadFailedException
      */
-    public function syncFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, ?User $user = null, ?array $description = null, bool $detaching = true, bool $is_public = true, bool $preserve_name = false): void
+    public function syncFiles(bool $is_public, \Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, ?User $user = null, bool $detaching = true, bool $preserve_name = false, array $tags = []): void
     {
         $file = $this->collectFiles($file);
 
         if ($file->count()) {
             if ($file->first() instanceof File) {
-                $ids = $file->pluck('id')->mapWithKeys(fn ($id) => [$id => ['description' => $description]]);
-                $this->files()->sync($ids, $detaching);
+                $this->files()->sync($file->pluck('id'), $detaching);
                 $this->load('files');
-            } elseif ($files = simpleFiles()->store(is_public: $is_public, file: $file, user: $user, preserve_name: $preserve_name)) {
-                $this->syncFiles($files, $user, $description, $is_public, $preserve_name);
+            } elseif ($files = simpleFiles()->store(is_public: $is_public, file: $file, user: $user, preserve_name: $preserve_name, tags: $tags)) {
+                $this->syncFiles(is_public: $is_public, file: $files, user: $user, preserve_name: $preserve_name, tags: $tags);
             }
         }
     }
@@ -189,51 +188,51 @@ trait HasFilesTrait
     /**
      * @param  \Illuminate\Http\File|File|Collection|UploadedFile|array|string  $file
      * @param  User|null  $user
-     * @param  array|null  $description
+     * @param  string[]  $tags
      * @param  bool  $detaching
      * @param  bool  $preserve_name
      * @return void
      *
      * @throws FileUploadFailedException
      */
-    public function syncPublicFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, ?User $user = null, ?array $description = null, bool $detaching = true, bool $preserve_name = false): void
+    public function syncPublicFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, ?User $user = null, bool $detaching = true, bool $preserve_name = false, array $tags = []): void
     {
-        $this->syncFiles($file, $user, $description, $detaching, true, $preserve_name);
+        $this->syncFiles(is_public: true, file: $file, user: $user, detaching: $detaching, preserve_name: $preserve_name, tags: $tags);
     }
 
     /**
      * @param  \Illuminate\Http\File|File|Collection|UploadedFile|array|string  $file
      * @param  User|null  $user
-     * @param  array|null  $description
+     * @param  string[]  $tags
      * @param  bool  $detaching
      * @param  bool  $preserve_name
      * @return void
      *
      * @throws FileUploadFailedException
      */
-    public function syncPrivateFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, ?User $user = null, ?array $description = null, bool $detaching = true, bool $preserve_name = false): void
+    public function syncPrivateFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, ?User $user = null, bool $detaching = true, bool $preserve_name = false, array $tags = []): void
     {
-        $this->syncFiles($file, $user, $description, $detaching, false, $preserve_name);
+        $this->syncFiles(is_public: true, file: $file, user: $user, detaching: $detaching, preserve_name: $preserve_name, tags: $tags);
     }
 
     /**
+     * @param  bool  $is_public
      * @param  \Illuminate\Http\File|File|Collection|UploadedFile|array|string  $file
      * @param  User|null  $user
      * @param  bool  $touch
-     * @param  bool  $is_public
      * @param  bool  $preserve_name
      * @return void
      *
      * @throws FileUploadFailedException
      */
-    public function detachFiles(\Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, ?User $user = null, bool $touch = true, bool $is_public = true, bool $preserve_name = false): void
+    public function detachFiles(bool $is_public, \Illuminate\Http\File|File|Collection|UploadedFile|array|string $file, ?User $user = null, bool $touch = true, bool $preserve_name = false): void
     {
         $file = $this->collectFiles($file);
 
         if ($file->count()) {
             if ($file->first() instanceof File) {
                 $this->files()->detach($file->pluck('id'), $touch);
-                $this->load('files');
+                $this->load('files.tags');
             } elseif ($files = simpleFiles()->store(is_public: $is_public, file: $file, user: $user, preserve_name: $preserve_name)) {
                 $this->detachFiles($files, $user, $is_public, $preserve_name);
             }
