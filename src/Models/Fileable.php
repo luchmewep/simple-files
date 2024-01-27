@@ -21,13 +21,6 @@ class Fileable extends MorphPivot
      */
     protected $table = 'fileables';
 
-    /**
-     * @var string[]
-     */
-    protected $casts = [
-        'description' => 'array',
-    ];
-
     protected $hidden = [
         'fileable_id',
         'fileable_type',

@@ -134,7 +134,8 @@ class SimpleFiles
                 user: $user,
                 preserve_name: $preserve_name,
                 return_as_model: $return_as_model,
-                options: $options
+                tags: $tags,
+                options: $options,
             ));
         }
 
@@ -596,7 +597,7 @@ class SimpleFiles
             }
 
             File::resolveRelationUsing($relationship_name, function (Model $file) use ($model_class) {
-                return $file->morphedByMany($model_class, 'fileable')->withPivot('description')->withTimestamps()->using(Fileable::class);
+                return $file->morphedByMany($model_class, 'fileable')->withTimestamps()->using(Fileable::class);
             });
         }
     }
