@@ -180,7 +180,7 @@ trait HasFilesTrait
                 $ids = $file->pluck('id')->mapWithKeys(fn ($id) => [$id => ['description' => $description]]);
                 $this->files()->sync($ids, $detaching);
                 $this->load('files');
-            } elseif ($files = simpleFiles()->store($file, $user, $is_public, $preserve_name)) {
+            } elseif ($files = simpleFiles()->store(is_public: $is_public, file: $file, user: $user, preserve_name: $preserve_name)) {
                 $this->syncFiles($files, $user, $description, $is_public, $preserve_name);
             }
         }
@@ -234,7 +234,7 @@ trait HasFilesTrait
             if ($file->first() instanceof File) {
                 $this->files()->detach($file->pluck('id'), $touch);
                 $this->load('files');
-            } elseif ($files = simpleFiles()->store($file, $user, $is_public, $preserve_name)) {
+            } elseif ($files = simpleFiles()->store(is_public: $is_public, file: $file, user: $user, preserve_name: $preserve_name)) {
                 $this->detachFiles($files, $user, $is_public, $preserve_name);
             }
         }
