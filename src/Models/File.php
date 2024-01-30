@@ -6,7 +6,9 @@ use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Contracts\Mail\Attachable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Mail\Mailables\Attachment;
+use Illuminate\Support\Facades\Storage;
 use Luchavez\SimpleFiles\Traits\HasFileFactoryTrait;
 use Luchavez\StarterKit\Traits\ModelOwnedTrait;
 use Luchavez\StarterKit\Traits\UsesUUIDTrait;
@@ -120,6 +122,44 @@ class File extends Model implements Attachable
     protected function getFilesystemAdapter(bool $read_only = false): Filesystem
     {
         return simpleFiles()->disk(is_public: $this->is_public, read_only: $read_only);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getContents(): ?string
+    {
+        return $this->getFilesystemAdapter()->get($this->path);
+    }
+
+    /**
+     * @return resource|null
+     */
+    public function getStreamedContents()
+    {
+        return $this->getFilesystemAdapter()->readStream($this->path);
+    }
+
+    /**
+     * @return UploadedFile|null
+     */
+    public function toUploadedFile(): ?UploadedFile
+    {
+        $local_disk = Storage::disk('local');
+        $tmp_path = 'simple-files/'.($this->is_public ? 'public' : 'private').'/'.$this->path;
+        $exists = $local_disk->exists($tmp_path);
+
+        // Check if already exists on simple-files folder on local disk
+        if (! $exists) {
+            $exists = $local_disk->put($tmp_path, $this->getStreamedContents());
+        }
+
+        // Check if exists
+        if ($exists) {
+            return new UploadedFile(path: $local_disk->path($tmp_path), originalName: $this->name, mimeType: $this->mime_type);
+        }
+
+        return null;
     }
 
     /**
