@@ -36,7 +36,7 @@ class SimpleFiles
      */
     public function getExpireAfter(): Carbon
     {
-        return Carbon::parse(config('simple-files.expire_after'));
+        return Carbon::parse(config('simple-files.private.expire_after'));
     }
 
     /**
