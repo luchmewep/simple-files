@@ -156,7 +156,7 @@ class File extends Model implements Attachable
     {
         $local_disk = Storage::disk('local');
         $tmp_path = 'simple-files/'.$this->uuid.'/';
-        $tmp_path .= $use_original_name ? $this->original_name : $this->path;
+        $tmp_path .= $use_original_name ? $this->original_name : $this->name;
 
         $exists = $local_disk->exists($tmp_path);
 
