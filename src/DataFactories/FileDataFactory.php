@@ -36,6 +36,11 @@ class FileDataFactory extends BaseDataFactory
     /**
      * @var string|null
      */
+    public ?string $original_name;
+
+    /**
+     * @var string|null
+     */
     public ?string $extension;
 
     /**

@@ -99,6 +99,14 @@ class File extends Model implements Attachable
         $this->attributes['path'] = trim($value, '/ ');
     }
 
+    /**
+     * @return string
+     */
+    public function getOriginalNameAttribute(): string
+    {
+        return $this->attributes['original_name'] ?? $this->attributes['name'];
+    }
+
     /***** MAIL RELATED *****/
 
     /**
@@ -141,12 +149,15 @@ class File extends Model implements Attachable
     }
 
     /**
+     * @param  bool  $use_original_name
      * @return UploadedFile|null
      */
-    public function toUploadedFile(): ?UploadedFile
+    public function toUploadedFile(bool $use_original_name = false): ?UploadedFile
     {
         $local_disk = Storage::disk('local');
-        $tmp_path = 'simple-files/'.($this->is_public ? 'public' : 'private').'/'.$this->path;
+        $tmp_path = 'simple-files/'.$this->uuid.'/';
+        $tmp_path .= $use_original_name ? $this->original_name : $this->path;
+
         $exists = $local_disk->exists($tmp_path);
 
         // Check if already exists on simple-files folder on local disk

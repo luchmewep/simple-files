@@ -154,10 +154,10 @@ class SimpleFiles
         if ($file instanceof UploadedFile || $file instanceof \Illuminate\Http\File) {
             $factory->mime_type = $file->getMimeType();
             $factory->extension = $file->extension();
+            $factory->original_name = $file instanceof UploadedFile ? $file->getClientOriginalName() : $file->getFilename();
 
             if ($preserve_name) {
-                $filename = $file instanceof UploadedFile ? $file->getClientOriginalName() : $file->getFilename();
-                $factory->name = Str::of($filename)->before('.')->jsonSerialize();
+                $factory->name = Str::of($factory->original_name)->before('.')->jsonSerialize();
             }
 
             $folder = collect([$folder, $factory->mime_type])->filter()->implode('/');
