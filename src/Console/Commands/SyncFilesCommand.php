@@ -115,6 +115,7 @@ class SyncFilesCommand extends Command
                 $metadata['is_public'] = $is_public;
                 $metadata['path'] = $path;
                 $metadata['name'] = $name;
+                $metadata['original_name'] = $name;
                 $metadata['size'] = $file->fileSize();
                 $metadata['created_at'] = $now;
                 $metadata['updated_at'] = $now;
